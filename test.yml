@@ -1,4 +1,4 @@
 
-JIUNIUSHOPPING_URL = "http://192.168.0.11:9082"
-JIUNIUFINANCE_URL="http://218.75.74.74:9086"
-SERVER_URL="http://test.yintong.com.cn"
+JIUNIUSHOPPING_URL = http://192.168.0.11:9082
+JIUNIUFINANCE_URL=http://218.75.74.74:9086
+SERVER_URL=http://test.yintong.com.cn
