@@ -1,0 +1,973 @@
+{
+	"doc_string": [
+		"本api文档主要分为两个部分. ",
+		"(1) RestObjects, 定义api 参数和返回值里用到的类型.",
+		"(2) Apis, 定义每隔api的名字, 作用, 参数和返回值",
+		"所有REST api 如果运行正常, 都会返回http code 200, 说明请求本身没有问题, 处理过了. ",
+		"并且, 返回值是一个RestResponse的结构. ",
+		"任何特别的错误, 需要返回非200的code都会在本文档中说明",
+		"1) 当authentication/authorization出错的时候, 会返回http 401/403",
+		"2) 后端有bug没有catch到exception的情况下, spring会返回 http 500错误"
+
+		"PS: 所有json定义中的doc_string都为说明, 与实现无关"
+
+	],
+	"RestObjects": {
+		"RestResponse": {
+			"doc_string": [
+				"API 返回值"
+			],
+			"code": {
+				"type": "integer",
+				"doc_string": "application level error code, 比如用户的输入值不合法. 没有错误的情况下为0"
+			},
+			"message": {
+				"type": "string",
+				"doc_string": "verbose information passed to caller for more details of the api execution result"
+			},
+			"data": {
+				"type": "RestObject",
+				"doc_string": "return data"
+			}
+		},
+		"CompanyInfoLogin":{
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+			"logo": {
+				"type": "string"
+			}
+		},
+		"ProductFeature": {
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+			"description": {
+				"type": "string"
+			},
+			"category": {
+				"type": "string"
+			}
+		},
+		"CompanyInfo": {
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+			"address": {
+				"type": "string"
+			},
+			"email": {
+				"type": "string"
+			},
+			"sysCode": {
+				"type": "string"
+			},
+			"loginUrl": {
+				"type": "string"
+			},
+			"telephone": {
+				"type": "string"
+			},
+			"backgroundUrl": {
+				"type": "string"
+			},
+			"extraFeatures": {
+				"type": "array",
+				"array_type": "ProductFeature"
+			}
+
+		},
+		"Permission": {
+			"name": {
+				"type": "string"
+			},
+			"permissionType": {
+				"type": "string",
+				"doc_string": "两种permission, 页面权限 site, 资产权限 asset"
+			},
+			"description": {
+				"type": "string",
+				"doc_string:": [
+					"一个json string, 可能包含权限的多种properties. ",
+					"例如页面权限: {webRouteName: home.dashboard, mobileRouteName: dashboard}"
+				]
+			}
+		},
+		"Role": {
+			"name": {
+				"type": "string"
+			},
+			"roleType": {
+				"type": "string",
+				"doc_string": "两种role, System和Customer, 分别代表系统定义的和用户自定义的. 目前前端暂时还不支持Customer"
+			},
+			"permissions": {
+				"type": "array",
+				"array_type": "Permission"
+			}
+		},
+		"User": {
+			"name": {
+				"type": "string"
+			},
+			"username": {
+				"type": "string"
+			},
+			"mobile": {
+				"type": "string"
+			},
+			"telephone": {
+				"type": "string"
+			},
+			"gender": {
+				"type": "string"
+			},
+			"email": {
+				"type": "string"
+			},
+			"headIcon": {
+				"type": "string"
+			},
+			"department": {
+				"type": "string"
+			},
+			"job": {
+				"type": "string"
+			},
+			"jobNum": {
+				"type": "string"
+			},
+			"companyDomain": {
+				"type": "string"
+			},
+			"verificationCode": {
+				"type": "string"
+			},
+			"bindMobile": {
+				"type": "integer"
+			},
+			"bindEmail": {
+				"type": "integer"
+			},
+			"alertNotificationType": {
+				"type": "integer",
+				"doc_string": "use to be removeAlert"
+			},
+			"latestPasswordUpdateTime": {
+				"type": "integer",
+				"doc_string": "millisecond time stamp"
+			}
+
+		},
+
+		"monitorTargetFile": {
+			"url": {
+				"type": "string"
+			},
+			"fileType": {
+				"type": "string"
+			},
+			"name": {
+				"type": "string"
+			},
+			"description": {
+				"type": "string"
+			},
+			"createDate": {
+				"type": "date"
+			}
+		},
+		"MonitorTargetBasic":{
+			"docstring": "简化版监控对象信息, 用于列表显示, 和dashboard的图中显示",
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+
+			"deviceType": {
+				"type": "string"
+			},
+			"photo": {
+				"type": "string"
+			},
+			"x_coordinate": {
+				"type": "integer",
+				"for_debug": "used to be xPoint"
+			},
+			"y_coordinate": {
+				"type": "integer",
+				"for_debug": "used to be yPoint"
+			}
+		},
+		"MonitorTarget": {
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+			"code": {
+				"type": "string"
+			},
+			"monitorTargetType": {
+				"type": "string"
+			},
+			"createTime": {
+				"type": "integer"
+			},
+			"serialNo": {
+				"type": "string"
+			},
+			"photo": {
+				"type": "string"
+			},
+			"ownerId": {
+				"type": "integer"
+			},
+
+			"x_coordinate": {
+				"doc_string": "在location图中的位置",
+				"type": "integer",
+				"for_debug": "used to be xPoint"
+			},
+			"y_coordinate": {
+				"type": "integer",
+				"for_debug": "used to be yPoint"
+			},
+			"files": {
+				"type": "array",
+				"array_type": "monitorTargetFile"
+			},
+			"locationId": {
+				"type": "integer"
+			},
+			"locationBackground": {
+				"type": "string"
+			},
+			"score":{
+				"type": "float"
+			},
+			"days": {
+				"type": "integer"
+			},
+			"yellowAlertCountToday": {
+				"type": "integer"
+			},
+			"redAlertCountToday": {
+				"type": "integer"
+			},
+			"enableSharing": {
+				"type": "integer"
+			},
+			"chainKey": {
+				"type": "string"
+			},
+			"rentClause": {
+				"type": "string"
+			},
+			"rentPrice": {
+				"type": "float"
+			},
+			"latestRunningStatus": {
+				"type": "integer"
+			}
+		},
+		"Location": {
+			"doc_string": [
+				"locations构成一个树的结构, 叶子节点的location下面只有设备",
+				"中间节点的location有子location, 也可能有监控对象, 例如一层里可能有几个房间的同时, 有一个监控设备没有放在任何房间里, 或者有一个房间本身就是一个监控对象"
+			],
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+			"companyId":{
+				"type": "integer"
+			},
+
+			"parent_id": {
+				"type": "integer"
+			},
+			"isLeaf": {
+				"type": "integer",
+				"doc_string": "是否是叶子节点, 叶子节点直接拥有监控对象, 例如room. 新需求, 一个location下可能既有device也有子location, 如果是这样, isLeaf就不需要, 或者为false"
+			},
+			"locationType": {
+				"type": "string"
+			},
+			"description": {
+				"type": "string"
+			},
+			"address":{
+				"type": "string"
+			},
+			"x_coordinate": {
+				"type": "float"
+
+			},
+			"y_coordinate": {
+				"type": "float"
+
+			},
+			"monitorTargetNum": {
+				"type": "integer",
+				"doc_string": "在这个location下的当前登录用户可见的设备总数"
+			},
+			"yellowAlertCountToday": {
+				"type": "integer",
+				"doc_string": "在这个location下的当前登录用户可见的设备的今日黄色报警总数"
+			},
+			"redAlertCountToday": {
+				"type": "integer",
+				"doc_string": ""
+			},
+			"onlineCount":{
+				"type": "integer",
+				"for_debug": "在这个location下的当前登录用户可见的在线设备总数"
+			},
+			"offlineCount":{
+				"type": "integer",
+				"for_debug": "在这个location下的当前登录用户可见的离线设备总数"
+			},
+			"days": {
+				"type": "integer"
+			},
+			"background": {
+				"type": "string"
+
+			},
+			"childLocations": {
+				"type": "array",
+				"array_type": "integer",
+				"doc_string": "子location的id列表"
+			},
+			"monitorTargets": {
+				"type": "array",
+				"array_type": "MonitorTargetBasic"
+			}
+		},
+		"MonitorTargetTypeBasic":{
+			"doc_string": "简化版监控对象类型信息, 用于列表显示",
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+
+			"description": {
+				"type": "string"
+			},
+			"logo_url": {
+				"type": "string"
+			}
+		},
+
+		"MeasureType":{
+			"doc_string": "监控指标类型信息, 例如, 温度, 湿度",
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+			"code": {
+				"type": "string"
+			},
+			"unit": {
+				"type": "string"
+			}
+		},
+
+		"MonitorTargetTypeDefaultRule":{
+			"doc_string": "某类监控对象类型对某类监控指标的默认报警模型",
+			"monitor_target_type_id": {
+				"type": "integer"
+			},
+			"measure_type_id": {
+				"type": "integer"
+			},
+			"measure_type_name": {
+				"type": "string"
+			},
+			"standard": {
+				"type": "float"
+			},
+			"yellow_upper_bound": {
+				"type": "float"
+			},
+			"yellow_lower_bound": {
+				"type": "float"
+			},
+			"red_upper_bound": {
+				"type": "float"
+			},
+			"red_lower_bound": {
+				"type": "float"
+			}
+
+
+		},
+
+		"MonitorTargetType":{
+			"doc_string": "监控对象类型信息",
+			"id": {
+				"type": "integer"
+			},
+			"name": {
+				"type": "string"
+			},
+
+			"description": {
+				"type": "string"
+			},
+			"logo_url": {
+				"type": "string"
+			}
+		}
+
+	},
+
+	"RestApis": {
+		"doc_string": [
+			"API 分为四种 ",
+			"(1) secure/** 需要查看Header X-Auth-Token里的token来进行authentication",
+			"(2) unsecure/**, 不需要查看token 比如login, doc, health",
+			"(3) internal/**, 用于其他service调用",
+			"其中 (1) (2) 是在端口8999, (3) 是在端口8899",
+			"客户端只需要调用(1) (2)",
+			"(1) 又可以细分为 ",
+			"(1.1) secure/customer/**, 所有在公司平台使用的api",
+			"(1.2) secure/admin/**, 所有在管理平台使用的api"
+		],
+		"apis_plain": {
+			"base_path": "/api/unsecure/",
+			"login": {
+				"method": "POST",
+				"doc_string": [
+					"login a user. if succeed, http code 200, response is token, otherwise 401",
+					"username is in format <username>@<company_domain_name>, e.g., aaron@merk"
+				],
+				"request_schema": {
+					"properties": {
+						"username": {
+							"type": "string"
+						},
+						"password": {
+							"type": "string"
+						}
+
+					}
+				},
+				"reply_schema": {
+					"token": "string"
+				}
+			},
+			"company": {
+				"methond": "GET",
+				"doc_string": "get basic company information to display in the login page, using the company domain name",
+				"request_schema": {
+					"properties": {
+						"companyDomainName": {
+							"type": "string"
+						}
+					}
+				},
+				"reply_schema": {
+					"type": "CompanyInfoLogin"
+				}
+			},
+			"find/password": {
+				"methond": "POST",
+				"doctring": "find password, no return data if succeeds, use message to pass feedback to caller",
+				"request_schema": {
+					"properties": {
+						"mobile": {
+							"type": "string"
+						},
+						"username": {
+							"type": "string"
+						},
+						"companyDomain": {
+							"type": "string"
+						}
+					}
+				},
+				"reply_schema": {
+					"message": "string"
+				}
+			}
+		},
+		"apis_secure": {
+			"doc_string": "must have header X-Auth-Token, if the token is invalid, 403 will be returned",
+			"customer": {
+				"base_path": "/api/secure/customer",
+				"doc_string": "查询或者管理当前登录用户",
+				"user": {
+					"api_v1.0": "api/rest/firm/person/mine/info",
+					"method": "GET",
+					"doc_string": "get currently logged in user information, by token",
+					"request_schema": {},
+					"reply_schema": {
+						"type": "User"
+					}
+				},
+				"user/roles": {
+					"method": "GET",
+					"doc_string": "获取当前登录用户的角色及权限",
+					"request_schema": {},
+					"reply_schema": {
+						"type": "array",
+						"array_type": "Role"
+					}
+				},
+				"company": {
+					"method": "GET",
+					"doc_string": "get currently logged in user's company full information, by token",
+					"request_schema": {},
+					"reply_schema": {
+						"type": "Company"
+					}
+				},
+				"modify/password": {
+					"method": "GET",
+					"doc_string": "修改当前登录用户的密码",
+					"request_schema": {
+						"properties":{
+							"oldPwd": {
+								"type": "string"
+							},
+							"newPwd": {
+								"newPwd": "string"
+							}
+						}
+						"required": ["oldPwd", "newPwd"]
+
+					},
+					"reply_schema": {
+
+					}
+				},
+				"monitor_target_type": {
+					"method": "GET",
+					"doc_string": "根据id获取监控对象类型",
+					"request_schema":{
+						"properties": {
+							"id": {
+								"type": "integer"
+							}
+
+						},
+						"required": ["id"]
+					},
+
+					"reply_schema": {
+						"type": "MonitorTargetType"
+					}
+				},
+				"measure_type": {
+					"method": "GET",
+					"doc_string": "根据id获取监控指标类型",
+					"request_schema":{
+						"properties": {
+							"id": {
+								"type": "integer"
+							}
+
+						},
+						"required": ["id"]
+					},
+
+					"reply_schema": {
+						"type": "MeasureType"
+					}
+				},
+				"monitor_target": {
+					"method": "GET",
+					"doc_string": "根据id获取监控对象",
+					"request_schema":{
+						"properties": {
+							"id": {
+								"type": "integer"
+							}
+
+						},
+						"required": ["id"]
+					},
+
+					"reply_schema": {
+						"type": "MonitorTarget"
+					}
+				},
+				"location": {
+					"method": "GET",
+					"doc_string": "根据id获取location信息",
+					"request_schema": {
+						"id": {
+							"type": "integer"
+						}
+					},
+					"reply_schema": {
+						"type": "Location"
+					}
+				},
+
+				"measure_type/create": {
+					"method": "POST",
+					"doc_string": "创建监控参数类型",
+					"request_schema": {
+						"name": {
+							"type": "string"
+						},
+						"code": {
+							"type": "string"
+						},
+						"unit": {
+							"type": "string"
+						},
+						"measurement": {
+							"type": "string"
+						}
+					},
+					"required": ["name", "code", "unit", "measurement"]
+					},
+					"reply_schema": {
+						"type": "MeasureType"
+					}
+				},
+				"monitor_target_type/create": {
+					"method": "POST",
+					"doc_string": "创建监控类型",
+					"request_schema": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"has_photo": {
+								"type": "integer"
+							},
+							"description": {
+								"type": "string"
+							},
+							"default_rules": {
+								"type": "array",
+								"array_type": "MonitorTargetTypeDefaultRule"
+							}
+						},
+						"required": ["name", "has_photo", "default_rules"]
+					},
+					"reply_schema": {
+						"type": "MonitorTargetType"
+					}
+				},
+				"monitor_target_type/modify/{id}": {
+					"method": "PUT",
+					"doc_string": "修改监控类型",
+					"request_schema": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"has_photo": {
+								"type": "integer"
+							},
+							"description": {
+								"type": "string"
+							},
+							"default_rules": {
+								"type": "array",
+								"array_type": "MonitorTargetTypeDefaultRule"
+							}
+						},
+						"required": ["id"]
+					},
+					"reply_schema": {
+						"type": "MonitorTargetType"
+					}
+				},
+				"monitor_target_type/delete/{id}": {
+					"method": "DELETE",
+					"doc_string": "创建监控对象类型",
+					"request_schema": {
+						"properties": {
+
+						},
+						"required": []
+					},
+					"reply_schema": {
+					}
+				},
+
+				"monitor_target/create": {
+					"method": "POST",
+					"doc_string": "创建监控对象",
+					"request_schema": {
+						"properties":{
+							"name": {
+								"type": "string"
+							},
+							"locationId": {
+								"type": "integer"
+							},
+							"xPoint": {
+								"type": "integer",
+								"doc_string": "在location背景图中的x坐标"
+							},
+							"yPoint": {
+								"type": "integer"
+							},
+							"brand": {
+								"type": "string",
+								"doc_string": "品牌"
+							},
+							"typeId": {
+								"type": "integer",
+								"doc_string": "设备种类id"
+							},
+							"ownerId": {
+								"type": "integer",
+								"doc_string": "所属管理员id"
+							},
+							"code": {
+								"type": "integer",
+								"doc_string": "设备编号"
+							},
+							"monitorCode": {
+								"type": "integer",
+								"doc_string": "设备种类id"
+							},
+							"scientistList": {
+								"type": "array",
+								"array_type": "integer",
+								"doc_string": "科学家列表"
+							},
+							"hasPicture": {
+								"type": "integer",
+								"doc_string": "是否上传图片",
+								"default": 0
+							},
+							"enableSharing": {
+								"type": "integer",
+								"doc_string": "是否共享",
+								"default": 0
+							},
+							"rentPrice": {
+								"type": "float",
+								"doc_string": "价格"
+							},
+							"rentClause": {
+								"type": "string",
+								"doc_string": "租赁条款"
+							}
+
+						}
+						"required": ["name", "code", "typeId", "ownerId", "monitorCode"]
+
+					},
+					"reply_schema": {
+						"type": "MonitorTarget"
+					}
+				},
+				"monitor_target/modify/{id}": {
+					"method": "PUT",
+					"doc_string": "修改监控对象",
+					"request_schema": {
+						"name": {
+							"type": "string"
+						},
+						"locationId": {
+							"type": "integer"
+						},
+						"xPoint": {
+							"type": "integer",
+							"doc_string": "在location背景图中的x坐标"
+						},
+						"yPoint": {
+							"type": "integer"
+						},
+						"brand": {
+							"type": "string",
+							"doc_string": "品牌"
+						},
+						"ownerId": {
+							"type": "integer",
+							"doc_string": "所属管理员id"
+						},
+						"monitorCode": {
+							"type": "integer",
+							"doc_string": "设备种类id"
+						},
+						"scientistList": {
+							"type": "array",
+							"array_type": "integer",
+							"doc_string": "科学家列表"
+						},
+						"hasPicture": {
+							"type": "integer",
+							"doc_string": "是否上传图片"
+						},
+						"enableSharing": {
+							"type": "integer",
+							"doc_string": "是否共享"
+						},
+						"rentPrice": {
+							"type": "float",
+							"doc_string": "价格"
+						},
+						"rentClause": {
+							"type": "string",
+							"doc_string": "租赁条款"
+						}
+						"required": []
+					},
+					"reply_schema": {
+						"type": "MonitorTarget"
+					}
+				},
+				"monitor_target/delete/{id}": {
+					"method": "DELETE",
+					"doc_string": "删除监控对象"
+				},
+
+				"location/create": {
+					"method": "POST",
+					"doc_string": "创建location",
+					"request_schema": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+							"parentId": {
+								"type": "integer"
+							},
+							"xPoint": {
+								"type": "integer",
+								"doc_string": "在上一级location背景图中的x坐标"
+							},
+							"yPoint": {
+								"type": "integer"
+							},
+							"type": {
+								"type": "string",
+								"doc_string": "种类, 例如, 楼, 层"
+							},
+							"address": {
+								"type": "string",
+								"doc_string": "如果location是root级的, 有其在地图上的地址"
+							},
+							"description": {
+								"type": "string",
+								"doc_string": "详情描述"
+							},
+							"latitude": {
+								"type": "float",
+								"doc_string": "在地图中的纬度"
+							},
+							"longitude": {
+								"type": "float",
+								"doc_string": "在地图中的经度"
+							},
+							"is_root": {
+								"type": "integer",
+								"doc_string": "是否是根节点"
+							}
+						},
+						"required": [
+							"name",
+							"type",
+							"is_root"
+						]
+					},
+					"reply_schema": {
+						"type": "Location"
+					}
+				},
+				"location/modify/{id}": {
+					"method": "PUT",
+					"doc_string": "修改location",
+					"request_schema": {
+						"properties": {
+							"name": {
+								"type": "string"
+							},
+
+							"xPoint": {
+								"type": "integer",
+								"doc_string": "在上一级location背景图中的x坐标"
+							},
+							"yPoint": {
+								"type": "integer"
+							},
+							"type": {
+								"type": "string",
+								"doc_string": "种类, 例如, 楼, 层"
+							},
+							"address": {
+								"type": "string",
+								"doc_string": "如果location是root级的, 有其在地图上的地址"
+							},
+							"description": {
+								"type": "string",
+								"doc_string": "详情描述"
+							},
+							"latitude": {
+								"type": "float",
+								"doc_string": "在地图中的纬度"
+							},
+							"longitude": {
+								"type": "float",
+								"doc_string": "在地图中的经度"
+							}
+
+						},
+						"required": [
+							"id"
+						]
+					},
+					"reply_schema": {
+						"type": "Location"
+					}
+				},
+				"location/delete/{id}": {
+					"method": "DELETE",
+					"doc_string": "删除location",
+					"request_schema": {
+						"properties": {
+							"is_delete_monitor_target": {
+								"type": "integer",
+								"doc_string": "是否删除这个location子树下的所有监控对象, 如果不是, 这些监控对象不会被删除, 但是location_id 会被设置为空",
+								"default": 0
+							}
+
+
+						},
+						"required": []
+					},
+					"reply_schema": {
+					}
+				}
+
+			},
+			"admin":{
+				"base_path": "/api/rest/secure/admin"
+			}
+		},
+		"apis_internal": {
+			"doc_string": "此类请求都来自于私有端口8899, 用于处理其他intelab内部服务来的请求, 不需要token (或者使用一个hardcode的token以防万一其他某service被hack了",
+			"base_path": "/api/rest/internal/"
+		}
+	}
+}
