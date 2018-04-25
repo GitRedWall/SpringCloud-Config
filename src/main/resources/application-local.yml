@@ -79,3 +79,14 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
+
+
+endpoints:
+  shutdown:
+    graceful:
+        # 开启优雅退出
+        enabled: true
+        # Wait "15" seconds before make a force shutdown
+        timeout: 15
+        #The time before launch graceful shutdown, the health checker return OUT_OF_SERVICE
+        wait: 15

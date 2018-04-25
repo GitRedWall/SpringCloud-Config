@@ -79,3 +79,10 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
+
+endpoints:
+  shutdown:
+    graceful:
+        enabled: true
+        timeout: 15
+        wait: 15
